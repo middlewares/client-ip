@@ -113,16 +113,26 @@ class ClientIp implements ServerMiddlewareInterface
         }
 
         foreach ($this->headers as $name) {
-            if ($request->hasHeader($name)) {
-                foreach (array_map('trim', explode(',', $request->getHeaderLine($name))) as $ip) {
-                    if (self::isValid($ip)) {
-                        return $ip;
-                    }
-                }
+            if ($request->hasHeader($name) && ($ip = self::getHeaderIp($request->getHeaderLine($name))) !== null) {
+                return $ip;
             }
         }
+    }
 
-        return $ips;
+    /**
+     * Returns the first valid ip found in the header.
+     *
+     * @param string $header
+     *
+     * @return string|null
+     */
+    private static function getHeaderIp($header)
+    {
+        foreach (array_map('trim', explode(',', $header)) as $ip) {
+            if (self::isValid($ip)) {
+                return $ip;
+            }
+        }
     }
 
     /**
