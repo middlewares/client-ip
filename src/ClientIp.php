@@ -61,7 +61,7 @@ class ClientIp implements ServerMiddlewareInterface
     }
 
     /**
-     * Set the attribute name to store the sesion instance.
+     * Set the attribute name to store client's IP address.
      *
      * @param string $attribute
      *
