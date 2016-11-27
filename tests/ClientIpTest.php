@@ -56,7 +56,11 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
 
     public function testRemote()
     {
-        $expected = filter_var(file_get_contents('http://ipecho.net/plain'), FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6);
+        $expected = filter_var(
+            file_get_contents('http://ipecho.net/plain'),
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6
+        );
 
         $this->assertNotFalse($expected);
         $request = new ServerRequest();
