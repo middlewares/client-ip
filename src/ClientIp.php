@@ -98,8 +98,6 @@ class ClientIp implements ServerMiddlewareInterface
      */
     private function getIp(ServerRequestInterface $request)
     {
-        $server = $request->getServerParams();
-
         if ($this->remote) {
             $ip = file_get_contents('http://ipecho.net/plain');
 
@@ -107,6 +105,8 @@ class ClientIp implements ServerMiddlewareInterface
                 return $ip;
             }
         }
+
+        $server = $request->getServerParams();
 
         if (!empty($server['REMOTE_ADDR']) && self::isValid($server['REMOTE_ADDR'])) {
             return $server['REMOTE_ADDR'];

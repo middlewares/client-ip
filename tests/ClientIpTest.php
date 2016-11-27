@@ -53,4 +53,25 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
         $this->assertEquals($ip, (string) $response->getBody());
     }
+
+    public function testRemote()
+    {
+        $expected = filter_var(file_get_contents('http://ipecho.net/plain'), FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6);
+
+        $this->assertNotFalse($expected);
+        $request = new ServerRequest();
+
+        $response = (new Dispatcher([
+            (new ClientIp())->remote(),
+            new CallableMiddleware(function ($request) {
+                $response = new Response();
+                $response->getBody()->write($request->getAttribute('client-ip'));
+
+                return $response;
+            }),
+        ]))->dispatch($request);
+
+        $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
+        $this->assertEquals($expected, (string) $response->getBody());
+    }
 }
