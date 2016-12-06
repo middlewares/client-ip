@@ -4,9 +4,7 @@ namespace Middlewares\Tests;
 
 use Middlewares\ClientIp;
 use Middlewares\Utils\Dispatcher;
-use Middlewares\Utils\CallableMiddleware;
-use Zend\Diactoros\ServerRequest;
-use Zend\Diactoros\Response;
+use Middlewares\Utils\Factory;
 
 class ClientIpTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +32,7 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
      */
     public function testClientIp(array $headers, $ip)
     {
-        $request = new ServerRequest();
+        $request = Factory::createServerRequest();
 
         foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
@@ -42,12 +40,9 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
 
         $response = (new Dispatcher([
             new ClientIp(),
-            new CallableMiddleware(function ($request) {
-                $response = new Response();
-                $response->getBody()->write($request->getAttribute('client-ip'));
-
-                return $response;
-            }),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
         ]))->dispatch($request);
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
@@ -63,16 +58,13 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertNotFalse($expected);
-        $request = new ServerRequest();
+        $request = Factory::createServerRequest();
 
         $response = (new Dispatcher([
             (new ClientIp())->remote(),
-            new CallableMiddleware(function ($request) {
-                $response = new Response();
-                $response->getBody()->write($request->getAttribute('client-ip'));
-
-                return $response;
-            }),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
         ]))->dispatch($request);
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
