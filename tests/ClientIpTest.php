@@ -38,12 +38,12 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
             $request = $request->withHeader($name, $value);
         }
 
-        $response = (new Dispatcher([
+        $response = Dispatcher::run([
             new ClientIp(),
             function ($request) {
                 echo $request->getAttribute('client-ip');
             },
-        ]))->dispatch($request);
+        ], $request);
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
         $this->assertEquals($ip, (string) $response->getBody());
@@ -58,14 +58,13 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertNotFalse($expected);
-        $request = Factory::createServerRequest();
 
-        $response = (new Dispatcher([
+        $response = Dispatcher::run([
             (new ClientIp())->remote(),
             function ($request) {
                 echo $request->getAttribute('client-ip');
             },
-        ]))->dispatch($request);
+        ]);
 
         $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
         $this->assertEquals($expected, (string) $response->getBody());
