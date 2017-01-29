@@ -5,6 +5,7 @@ namespace Middlewares\Tests;
 use Middlewares\ClientIp;
 use Middlewares\Utils\Dispatcher;
 use Middlewares\Utils\Factory;
+use Psr\Http\Message\ResponseInterface;
 
 class ClientIpTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,14 +14,14 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    'Client-Ip' => 'unknow,123.456.789.10,123.234.123.10',
-                    'X-Forwarded' => '123.234.123.10',
+                    'X-Forwarded' => 'unknow,123.456.789.10,123.234.123.10',
+                    'Client-Ip' => '123.234.123.10',
                 ],
                 '123.234.123.10',
             ], [
                 [
-                    'Client-Ip' => 'unknow,123.456.789.10,123.234.123.10',
-                    'X-Forwarded' => '123.234.123.11',
+                    'X-Forwarded' => 'unknow,123.456.789.10,123.234.123.10',
+                    'Client-Ip' => '123.234.123.11',
                 ],
                 '123.234.123.10',
             ],
@@ -30,13 +31,29 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider ipsProvider
      */
-    public function testClientIp(array $headers, $ip)
+    public function testClientIpProxy(array $headers, $ip)
     {
-        $request = Factory::createServerRequest();
+        $request = Factory::createServerRequest(['REMOTE_ADDR' => '123.123.123.123']);
 
         foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
         }
+
+        $response = Dispatcher::run([
+            (new ClientIp())->proxy(),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
+        ], $request);
+
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertEquals($ip, (string) $response->getBody());
+    }
+
+    public function testClientIpNotProxy()
+    {
+        $request = Factory::createServerRequest(['REMOTE_ADDR' => '123.123.123.123'])
+            ->withHeader('X-Forwarded', '11.11.11.11');
 
         $response = Dispatcher::run([
             new ClientIp(),
@@ -45,8 +62,8 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
             },
         ], $request);
 
-        $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
-        $this->assertEquals($ip, (string) $response->getBody());
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertEquals('123.123.123.123', (string) $response->getBody());
     }
 
     public function testRemote()
@@ -66,7 +83,7 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
             },
         ]);
 
-        $this->assertInstanceOf('Psr\\Http\\Message\\ResponseInterface', $response);
+        $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertEquals($expected, (string) $response->getBody());
     }
 }

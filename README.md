@@ -40,12 +40,19 @@ $response = $dispatcher->dispatch(new ServerRequest());
 
 ## Options
 
-#### `headers(array $headers)`
+#### `proxy(array $ips = [], array $headers = [])`
 
-List of trusted headers to search the ip if `REMOTE_ADDR` server parameter is not valid. By default is:
+Configure the detection through proxies. The first argument is an array of ips of the trusted proxies. If it's empty, no ip filtering is made. The second argument is a list of the headers to inspect. If it's not defined, uses the default value `['Forwarded', 'Forwarded-For', 'Client-Ip', 'X-Forwarded', 'X-Forwarded-For', 'X-Cluster-Client-Ip']`. Disabled by default.
 
 ```php
-['Forwarded', 'Forwarded-For', 'Client-Ip', 'X-Forwarded', 'X-Forwarded-For', 'X-Cluster-Client-Ip']
+//Use proxies
+$middleware = (new Middlewares\ClientIp())->proxy();
+
+//Trust only some proxies by ip
+$middleware = (new Middlewares\ClientIp())->proxy(['10.10.10.10', '10.10.10.11']);
+
+//Trust only some proxies by ip using a specific header
+$middleware = (new Middlewares\ClientIp())->proxy(['10.10.10.10', '10.10.10.11'], ['X-Forwarded-For']);
 ```
 
 #### `remote($remote = true)`

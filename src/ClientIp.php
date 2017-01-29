@@ -20,27 +20,36 @@ class ClientIp implements MiddlewareInterface
     private $attribute = 'client-ip';
 
     /**
-     * @var array The trusted headers
+     * @var array The trusted proxy headers
      */
-    private $headers = [
-        'Forwarded',
-        'Forwarded-For',
-        'Client-Ip',
-        'X-Forwarded',
-        'X-Forwarded-For',
-        'X-Cluster-Client-Ip',
-    ];
+    private $proxyHeaders = [];
 
     /**
-     * Configure the trusted headers.
+     * @var array The trusted proxy ips
+     */
+    private $proxyIps = [];
+
+    /**
+     * Configure the proxy.
      *
+     * @param array $ips
      * @param array $headers
      *
      * @return self
      */
-    public function headers(array $headers)
-    {
-        $this->headers = $headers;
+    public function proxy(
+        array $ips = [],
+        array $headers = [
+            'Forwarded',
+            'Forwarded-For',
+            'X-Forwarded',
+            'X-Forwarded-For',
+            'X-Cluster-Client-Ip',
+            'Client-Ip'
+        ]
+    ) {
+        $this->proxyIps = $ips;
+        $this->proxyHeaders = $headers;
 
         return $this;
     }
@@ -106,13 +115,18 @@ class ClientIp implements MiddlewareInterface
             }
         }
 
+        $ip = null;
         $server = $request->getServerParams();
 
         if (!empty($server['REMOTE_ADDR']) && self::isValid($server['REMOTE_ADDR'])) {
-            return $server['REMOTE_ADDR'];
+            $ip = $server['REMOTE_ADDR'];
         }
 
-        foreach ($this->headers as $name) {
+        if (empty($this->proxyHeaders) || (!empty($this->proxyIps) && !in_array($ip, $this->proxyIps))) {
+            return $ip;
+        }
+
+        foreach ($this->proxyHeaders as $name) {
             if ($request->hasHeader($name) && ($ip = self::getHeaderIp($request->getHeaderLine($name))) !== null) {
                 return $ip;
             }
