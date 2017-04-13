@@ -46,7 +46,6 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
             },
         ], $request);
 
-        $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertEquals($ip, (string) $response->getBody());
     }
 
@@ -62,7 +61,6 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
             },
         ], $request);
 
-        $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertEquals('123.123.123.123', (string) $response->getBody());
     }
 
@@ -83,7 +81,6 @@ class ClientIpTest extends \PHPUnit_Framework_TestCase
             },
         ]);
 
-        $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertEquals($expected, (string) $response->getBody());
     }
 }
