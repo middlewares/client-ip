@@ -107,29 +107,74 @@ class ClientIp implements MiddlewareInterface
      */
     private function getIp(ServerRequestInterface $request)
     {
+        $remoteIp = $this->getRemoteIp();
+
+        if (!empty($remoteIp)) {
+            // Found IP address via remote service.
+            return $remoteIp;
+        }
+
+        $localIp = $this->getLocalIp($request);
+
+        if ($this->proxyIps && !in_array($localIp, $this->proxyIps)) {
+            // Local IP address does not point at a known proxy, do not attempt
+            // to read proxied IP address.
+            return $localIp;
+        }
+
+        $proxiedIp = $this->getProxiedIp($request);
+
+        if (!empty($proxiedIp)) {
+            // Found IP address via proxy-defined headers.
+            return $proxiedIp;
+        }
+
+        return $localIp;
+    }
+
+    /**
+     * Returns the IP address from remote service.
+     *
+     * @return string|null
+     */
+    private function getRemoteIp()
+    {
         if ($this->remote) {
             $ip = file_get_contents('http://ipecho.net/plain');
-
             if (self::isValid($ip)) {
                 return $ip;
             }
         }
+    }
 
-        $ip = null;
+    /**
+     * Returns the first valid proxied IP found.
+     *
+     * @return string|null
+     */
+    private function getProxiedIp(ServerRequestInterface $request)
+    {
+        foreach ($this->proxyHeaders as $name) {
+            if ($request->hasHeader($name)) {
+                $ip = self::getHeaderIp($request->getHeaderLine($name));
+                if (self::isValid($ip)) {
+                    return $ip;
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the remote address of the request, if valid.
+     *
+     * @return string|null
+     */
+    private function getLocalIp(ServerRequestInterface $request)
+    {
         $server = $request->getServerParams();
 
         if (!empty($server['REMOTE_ADDR']) && self::isValid($server['REMOTE_ADDR'])) {
-            $ip = $server['REMOTE_ADDR'];
-        }
-
-        if (empty($this->proxyHeaders) || (!empty($this->proxyIps) && !in_array($ip, $this->proxyIps))) {
-            return $ip;
-        }
-
-        foreach ($this->proxyHeaders as $name) {
-            if ($request->hasHeader($name) && ($ip = self::getHeaderIp($request->getHeaderLine($name))) !== null) {
-                return $ip;
-            }
+            return $server['REMOTE_ADDR'];
         }
     }
 
