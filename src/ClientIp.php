@@ -157,7 +157,7 @@ class ClientIp implements MiddlewareInterface
         foreach ($this->proxyHeaders as $name) {
             if ($request->hasHeader($name)) {
                 $ip = self::getHeaderIp($request->getHeaderLine($name));
-                if (self::isValid($ip)) {
+                if ($ip !== null) {
                     return $ip;
                 }
             }
