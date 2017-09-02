@@ -2,13 +2,14 @@
 
 namespace Middlewares\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Eloquent\Phony\Phpunit\Phony;
 use Middlewares\ClientIp;
 use Middlewares\Utils\Dispatcher;
 use Middlewares\Utils\Factory;
 use Psr\Http\Message\ResponseInterface;
 
-class ClientIpTest extends \PHPUnit_Framework_TestCase
+class ClientIpTest extends TestCase
 {
     public function tearDown()
     {
