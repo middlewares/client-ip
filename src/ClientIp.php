@@ -2,10 +2,10 @@
 
 namespace Middlewares;
 
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ClientIp implements MiddlewareInterface
 {
@@ -45,7 +45,7 @@ class ClientIp implements MiddlewareInterface
             'X-Forwarded',
             'X-Forwarded-For',
             'X-Cluster-Client-Ip',
-            'Client-Ip'
+            'Client-Ip',
         ]
     ) {
         $this->proxyIps = $ips;

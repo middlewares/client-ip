@@ -2,12 +2,11 @@
 
 namespace Middlewares\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Eloquent\Phony\Phpunit\Phony;
 use Middlewares\ClientIp;
 use Middlewares\Utils\Dispatcher;
 use Middlewares\Utils\Factory;
-use Psr\Http\Message\ResponseInterface;
+use PHPUnit\Framework\TestCase;
 
 class ClientIpTest extends TestCase
 {
@@ -38,6 +37,7 @@ class ClientIpTest extends TestCase
 
     /**
      * @dataProvider ipsProvider
+     * @param mixed $ip
      */
     public function testClientIpProxy(array $headers, $ip)
     {
