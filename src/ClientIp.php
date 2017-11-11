@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Middlewares;
 
@@ -31,11 +32,6 @@ class ClientIp implements MiddlewareInterface
 
     /**
      * Configure the proxy.
-     *
-     * @param array $ips
-     * @param array $headers
-     *
-     * @return self
      */
     public function proxy(
         array $ips = [],
@@ -57,12 +53,8 @@ class ClientIp implements MiddlewareInterface
     /**
      * To get the ip from a remote service.
      * Useful for testing purposes on localhost.
-     *
-     * @param bool $remote
-     *
-     * @return self
      */
-    public function remote($remote = true)
+    public function remote(bool $remote = true): self
     {
         $this->remote = $remote;
 
@@ -71,12 +63,8 @@ class ClientIp implements MiddlewareInterface
 
     /**
      * Set the attribute name to store client's IP address.
-     *
-     * @param string $attribute
-     *
-     * @return self
      */
-    public function attribute($attribute)
+    public function attribute(string $attribute): self
     {
         $this->attribute = $attribute;
 
@@ -85,10 +73,8 @@ class ClientIp implements MiddlewareInterface
 
     /**
      * Process a server request and return a response.
-     *
-     * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $ip = $this->getIp($request);
 
@@ -97,8 +83,6 @@ class ClientIp implements MiddlewareInterface
 
     /**
      * Detect and return the ip.
-     *
-     * @param ServerRequestInterface $request
      *
      * @return string|null
      */
@@ -178,11 +162,9 @@ class ClientIp implements MiddlewareInterface
     /**
      * Returns the first valid ip found in the header.
      *
-     * @param string $header
-     *
      * @return string|null
      */
-    private static function getHeaderIp($header)
+    private static function getHeaderIp(string $header)
     {
         foreach (array_map('trim', explode(',', $header)) as $ip) {
             if (self::isValid($ip)) {
@@ -193,12 +175,8 @@ class ClientIp implements MiddlewareInterface
 
     /**
      * Check that a given string is a valid IP address.
-     *
-     * @param string $ip
-     *
-     * @return bool
      */
-    private static function isValid($ip)
+    private static function isValid(string $ip): bool
     {
         return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) !== false;
     }
