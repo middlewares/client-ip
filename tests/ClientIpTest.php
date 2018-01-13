@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Middlewares\Tests;
 
@@ -16,7 +17,7 @@ class ClientIpTest extends TestCase
         Phony::restoreGlobalFunctions();
     }
 
-    public function ipsProvider()
+    public function ipsProvider(): array
     {
         return [
             [
@@ -27,6 +28,7 @@ class ClientIpTest extends TestCase
                 '123.234.123.10',
             ], [
                 [
+                    'Forwarded' => 'unknow',
                     'X-Forwarded' => 'unknow,123.456.789.10,123.234.123.10',
                     'Client-Ip' => '123.234.123.11',
                 ],
@@ -37,9 +39,8 @@ class ClientIpTest extends TestCase
 
     /**
      * @dataProvider ipsProvider
-     * @param mixed $ip
      */
-    public function testClientIpProxy(array $headers, $ip)
+    public function testClientIpProxy(array $headers, string $ip)
     {
         $request = Factory::createServerRequest(['REMOTE_ADDR' => '123.123.123.123']);
 
@@ -70,6 +71,58 @@ class ClientIpTest extends TestCase
         ], $request);
 
         $this->assertEquals('123.123.123.123', (string) $response->getBody());
+    }
+
+    public function testCustomAttribute()
+    {
+        $request = Factory::createServerRequest(['REMOTE_ADDR' => '123.123.123.123']);
+
+        $response = Dispatcher::run([
+            (new ClientIp())->attribute('ip'),
+            function ($request) {
+                echo $request->getAttribute('ip');
+            },
+        ], $request);
+
+        $this->assertEquals('123.123.123.123', (string) $response->getBody());
+    }
+
+    public function testProxyIp()
+    {
+        $request = Factory::createServerRequest(['REMOTE_ADDR' => '1.1.1.1'])
+            ->withHeader('X-Forwarded', '2.2.2.2');
+
+        $response = Dispatcher::run([
+            (new ClientIp())->proxy(['3.3.3.3']),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
+        ], $request);
+
+        $this->assertEquals('1.1.1.1', (string) $response->getBody());
+
+        $response = Dispatcher::run([
+            (new ClientIp())->proxy(['1.1.1.1']),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
+        ], $request);
+
+        $this->assertEquals('2.2.2.2', (string) $response->getBody());
+    }
+
+    public function testNoRemoteAddr()
+    {
+        $request = Factory::createServerRequest();
+
+        $response = Dispatcher::run([
+            new ClientIp(),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
+        ], $request);
+
+        $this->assertEquals('', (string) $response->getBody());
     }
 
     public function testRemote()
