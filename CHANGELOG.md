@@ -5,12 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## UNRELEASED
+## [UNRELEASED]
 
 ### Added
 
 - Improved testing and added code coverage reporting
 - Added tests for PHP 7.2
+
+### Changed
+
+- Upgraded to the final version of PSR-15 `psr/http-server-middleware`
 
 ### Fixed
 
@@ -66,6 +70,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First version
 
+[UNRELEASED]: https://github.com/middlewares/client-ip/compare/v0.7.0...HEAD
 [0.7.0]: https://github.com/middlewares/client-ip/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/middlewares/client-ip/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/middlewares/client-ip/compare/v0.4.0...v0.5.0
