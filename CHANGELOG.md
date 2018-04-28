@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+
+### Fixed
+
+- Support for `Forwarded` and `X-Forwarded` headers, that use a different syntax
+- Updated testing libraries
+
 ## [1.0.0] - 2018-01-27
 
 ### Added
@@ -37,7 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Append `.dist` suffix to phpcs.xml and phpunit.xml files
 - Changed the configuration of phpcs and php_cs
 - Upgraded phpunit to the latest version and improved its config file
-- Updated to `http-interop/http-middleware#0.5`
+- Updated to `http-interop/http-middleware[#0](https://github.com/middlewares/client-ip/issues/0).5`
 
 ## [0.5.0] - 2017-07-13
 
@@ -57,19 +64,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - Updated tests
-- Updated to `http-interop/http-middleware#0.4`
-- Updated `friendsofphp/php-cs-fixer#2.0`
+- Updated to `http-interop/http-middleware[#0](https://github.com/middlewares/client-ip/issues/0).4`
+- Updated `friendsofphp/php-cs-fixer[#2](https://github.com/middlewares/client-ip/issues/2).0`
 
 ## [0.2.0] - 2016-11-27
 
 ### Changed
 
-- Updated to `http-interop/http-middleware#0.3`
+- Updated to `http-interop/http-middleware[#0](https://github.com/middlewares/client-ip/issues/0).3`
 
 ## 0.1.0 - 2016-10-10
 
 First version
 
+[UNRELEASED]: https://github.com/middlewares/client-ip/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/middlewares/client-ip/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/middlewares/client-ip/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/middlewares/client-ip/compare/v0.5.0...v0.6.0
