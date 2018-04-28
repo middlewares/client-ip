@@ -29,10 +29,16 @@ class ClientIpTest extends TestCase
             ], [
                 [
                     'Forwarded' => 'unknow',
-                    'X-Forwarded' => 'unknow,123.456.789.10,123.234.123.10',
+                    'X-Forwarded' => 'unknow; for=123.456.789.10,for=123.234.123.10',
                     'Client-Ip' => '123.234.123.11',
                 ],
                 '123.234.123.10',
+            ], [
+                [
+                    'Forwarded' => 'for=192.0.2.60; proto=http; by=203.0.113.43',
+                    'Client-Ip' => '123.234.123.11',
+                ],
+                '192.0.2.60',
             ],
         ];
     }
@@ -90,7 +96,7 @@ class ClientIpTest extends TestCase
     public function testProxyIp()
     {
         $request = Factory::createServerRequest(['REMOTE_ADDR' => '1.1.1.1'])
-            ->withHeader('X-Forwarded', '2.2.2.2');
+            ->withHeader('X-Forwarded', 'For=2.2.2.2');
 
         $response = Dispatcher::run([
             (new ClientIp())->proxy(['3.3.3.3']),

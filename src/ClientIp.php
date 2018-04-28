@@ -137,7 +137,12 @@ class ClientIp implements MiddlewareInterface
     {
         foreach ($this->proxyHeaders as $name) {
             if ($request->hasHeader($name)) {
-                $ip = self::getHeaderIp($request->getHeaderLine($name));
+                if (substr($name, -9) === 'Forwarded') {
+                    $ip = self::getForwardedHeaderIp($request->getHeaderLine($name));
+                } else {
+                    $ip = self::getHeaderIp($request->getHeaderLine($name));
+                }
+
                 if ($ip !== null) {
                     return $ip;
                 }
@@ -156,6 +161,28 @@ class ClientIp implements MiddlewareInterface
 
         if (!empty($server['REMOTE_ADDR']) && self::isValid($server['REMOTE_ADDR'])) {
             return $server['REMOTE_ADDR'];
+        }
+    }
+
+    /**
+     * Returns the first valid ip found in the Forwarded or X-Forwarded header.
+     *
+     * @return string|null
+     */
+    private static function getForwardedHeaderIp(string $header)
+    {
+        foreach (array_map('trim', explode(',', strtolower($header))) as $values) {
+            foreach (array_map('trim', explode(';', $values)) as $directive) {
+                if (strpos($directive, 'for=') !== 0) {
+                    continue;
+                }
+
+                $ip = trim(substr($directive, 4));
+
+                if (self::isValid($ip)) {
+                    return $ip;
+                }
+            }
         }
     }
 
