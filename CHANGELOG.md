@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## [1.0.1] - 2018-04-28
 
 ### Fixed
 
-- Support for `Forwarded` and `X-Forwarded` headers, that use a different syntax
+- Support for `Forwarded` and `X-Forwarded` headers, that use a different syntax [#9](https://github.com/middlewares/client-ip/issues/9)
 - Updated testing libraries
 
 ## [1.0.0] - 2018-01-27
@@ -77,7 +77,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First version
 
-[UNRELEASED]: https://github.com/middlewares/client-ip/compare/v1.0.0...HEAD
+[1.0.1]: https://github.com/middlewares/client-ip/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/middlewares/client-ip/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/middlewares/client-ip/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/middlewares/client-ip/compare/v0.5.0...v0.6.0
