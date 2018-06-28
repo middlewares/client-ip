@@ -93,13 +93,43 @@ class ClientIpTest extends TestCase
         $this->assertEquals('123.123.123.123', (string) $response->getBody());
     }
 
-    public function testProxyIp()
+    public function proxyProvider(): array
     {
-        $request = Factory::createServerRequest(['REMOTE_ADDR' => '1.1.1.1'])
-            ->withHeader('X-Forwarded', 'For=2.2.2.2');
+        // 4.4.4.4 is IP spoofed by cleint
+        // 3.3.3.3 is actual clients IP, added by first proxy.
+        // 2.2.2.2 is first proxies ip
+        return [
+            [
+                [
+                    'X-Forwarded' => 'For=4.4.4.4,for=3.3.3.3,for=2.2.2.2',
+                ],
+            ],
+            [
+                [
+                    'Forwarded' => 'for=4.4.4.4;for=3.3.3.3;for=2.2.2.2',
+                ],
+            ],
+            [
+                [
+                    'X-Forwarded-For' => '4.4.4.4, 3.3.3.3, 2.2.2.2',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider proxyProvider
+     */
+    public function testProxyIp(array $headers)
+    {
+        $request = Factory::createServerRequest(['REMOTE_ADDR' => '1.1.1.1']);
+
+        foreach ($headers as $name => $value) {
+            $request = $request->withHeader($name, $value);
+        }
 
         $response = Dispatcher::run([
-            (new ClientIp())->proxy(['3.3.3.3']),
+            (new ClientIp())->proxy(['5.5.5.5']),
             function ($request) {
                 echo $request->getAttribute('client-ip');
             },
@@ -108,13 +138,13 @@ class ClientIpTest extends TestCase
         $this->assertEquals('1.1.1.1', (string) $response->getBody());
 
         $response = Dispatcher::run([
-            (new ClientIp())->proxy(['1.1.1.1']),
+            (new ClientIp())->proxy(['1.1.1.1', '2.2.2.2']),
             function ($request) {
                 echo $request->getAttribute('client-ip');
             },
         ], $request);
 
-        $this->assertEquals('2.2.2.2', (string) $response->getBody());
+        $this->assertEquals('3.3.3.3', (string) $response->getBody());
     }
 
     public function testNoRemoteAddr()
