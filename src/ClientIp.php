@@ -138,9 +138,9 @@ class ClientIp implements MiddlewareInterface
         foreach ($this->proxyHeaders as $name) {
             if ($request->hasHeader($name)) {
                 if (substr($name, -9) === 'Forwarded') {
-                    $ip = self::getForwardedHeaderIp($request->getHeaderLine($name));
+                    $ip = $this->getForwardedHeaderIp($request->getHeaderLine($name));
                 } else {
-                    $ip = self::getHeaderIp($request->getHeaderLine($name));
+                    $ip = $this->getHeaderIp($request->getHeaderLine($name));
                 }
 
                 if ($ip !== null) {
@@ -169,17 +169,17 @@ class ClientIp implements MiddlewareInterface
      *
      * @return string|null
      */
-    private static function getForwardedHeaderIp(string $header)
+    private function getForwardedHeaderIp(string $header)
     {
-        foreach (array_map('trim', explode(',', strtolower($header))) as $values) {
-            foreach (array_map('trim', explode(';', $values)) as $directive) {
+        foreach (array_reverse(array_map('trim', explode(',', strtolower($header)))) as $values) {
+            foreach (array_reverse(array_map('trim', explode(';', $values))) as $directive) {
                 if (strpos($directive, 'for=') !== 0) {
                     continue;
                 }
 
                 $ip = trim(substr($directive, 4));
 
-                if (self::isValid($ip)) {
+                if (self::isValid($ip) && !in_array($ip, $this->proxyIps)) {
                     return $ip;
                 }
             }
@@ -191,10 +191,10 @@ class ClientIp implements MiddlewareInterface
      *
      * @return string|null
      */
-    private static function getHeaderIp(string $header)
+    private function getHeaderIp(string $header)
     {
-        foreach (array_map('trim', explode(',', $header)) as $ip) {
-            if (self::isValid($ip)) {
+        foreach (array_reverse(array_map('trim', explode(',', $header))) as $ip) {
+            if (self::isValid($ip) && !in_array($ip, $this->proxyIps)) {
                 return $ip;
             }
         }
