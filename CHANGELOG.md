@@ -92,6 +92,7 @@ First version
 [#11]: https://github.com/middlewares/client-ip/issues/11
 [#9]: https://github.com/middlewares/client-ip/issues/9
 
+[1.1.0]: https://github.com/middlewares/client-ip/compare/v1.0.2...HEAD
 [1.0.2]: https://github.com/middlewares/client-ip/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/middlewares/client-ip/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/middlewares/client-ip/compare/v0.7.0...v1.0.0
