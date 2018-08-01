@@ -48,7 +48,7 @@ class ClientIpTest extends TestCase
      */
     public function testClientIpProxy(array $headers, string $ip)
     {
-        $request = Factory::createServerRequest(['REMOTE_ADDR' => '123.123.123.123']);
+        $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '123.123.123.123']);
 
         foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
@@ -66,7 +66,7 @@ class ClientIpTest extends TestCase
 
     public function testClientIpNotProxy()
     {
-        $request = Factory::createServerRequest(['REMOTE_ADDR' => '123.123.123.123'])
+        $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '123.123.123.123'])
             ->withHeader('X-Forwarded', '11.11.11.11');
 
         $response = Dispatcher::run([
@@ -81,7 +81,7 @@ class ClientIpTest extends TestCase
 
     public function testCustomAttribute()
     {
-        $request = Factory::createServerRequest(['REMOTE_ADDR' => '123.123.123.123']);
+        $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '123.123.123.123']);
 
         $response = Dispatcher::run([
             (new ClientIp())->attribute('ip'),
@@ -95,7 +95,7 @@ class ClientIpTest extends TestCase
 
     public function testProxyIp()
     {
-        $request = Factory::createServerRequest(['REMOTE_ADDR' => '1.1.1.1'])
+        $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '1.1.1.1'])
             ->withHeader('X-Forwarded', 'For=2.2.2.2');
 
         $response = Dispatcher::run([
@@ -119,7 +119,7 @@ class ClientIpTest extends TestCase
 
     public function testNoRemoteAddr()
     {
-        $request = Factory::createServerRequest();
+        $request = Factory::createServerRequest('GET', '/');
 
         $response = Dispatcher::run([
             new ClientIp(),
