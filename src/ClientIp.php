@@ -122,7 +122,8 @@ class ClientIp implements MiddlewareInterface
     {
         if ($this->remote) {
             $ip = file_get_contents('http://ipecho.net/plain');
-            if (self::isValid($ip)) {
+
+            if ($ip && self::isValid($ip)) {
                 return $ip;
             }
         }
