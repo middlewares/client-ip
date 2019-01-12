@@ -97,7 +97,7 @@ class ClientIp implements MiddlewareInterface
 
         $localIp = $this->getLocalIp($request);
 
-        if ($this->proxyIps && !in_array($localIp, $this->proxyIps)) {
+        if ($this->proxyIps && !$this->isInProxiedIps($localIp)) {
             // Local IP address does not point at a known proxy, do not attempt
             // to read proxied IP address.
             return $localIp;
@@ -111,6 +111,36 @@ class ClientIp implements MiddlewareInterface
         }
 
         return $localIp;
+    }
+
+    /**
+     * checks if the given ip address is in the list of proxied ips provided
+     *
+     * @param  string $ip
+     * @return bool
+     */
+    private function isInProxiedIps(string $ip): bool
+    {
+        foreach ($this->proxyIps as $proxyIp) {
+            if ($ip === $proxyIp || self::isInCIDR($ip, $proxyIp)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function isInCIDR(string $ip, string $cidr): bool
+    {
+        $tokens = explode('/', $cidr);
+        if (count($tokens) !== 2 || !self::isValid($ip) || !self::isValid($tokens[0]) || !is_numeric($tokens[1])) {
+            return false;
+        }
+
+        $cidr_base = ip2long($tokens[0]);
+        $ip_long = ip2long($ip);
+        $mask = (0xffffffff << intval($tokens[1])) & 0xffffffff;
+
+        return ($cidr_base & $mask) === ($ip_long & $mask);
     }
 
     /**
@@ -180,7 +210,7 @@ class ClientIp implements MiddlewareInterface
 
                 $ip = trim(substr($directive, 4));
 
-                if (self::isValid($ip) && !in_array($ip, $this->proxyIps)) {
+                if (self::isValid($ip) && !$this->isInProxiedIps($ip)) {
                     return $ip;
                 }
             }
@@ -195,7 +225,7 @@ class ClientIp implements MiddlewareInterface
     private function getHeaderIp(string $header)
     {
         foreach (array_reverse(array_map('trim', explode(',', $header))) as $ip) {
-            if (self::isValid($ip) && !in_array($ip, $this->proxyIps)) {
+            if (self::isValid($ip) && !$this->isInProxiedIps($ip)) {
                 return $ip;
             }
         }
