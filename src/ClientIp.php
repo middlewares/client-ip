@@ -43,7 +43,7 @@ class ClientIp implements MiddlewareInterface
             'X-Cluster-Client-Ip',
             'Client-Ip',
         ]
-    ) {
+    ): self {
         $this->proxyIps = $ips;
         $this->proxyHeaders = $headers;
 
