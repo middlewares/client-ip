@@ -40,7 +40,7 @@ $response = $dispatcher->dispatch(new ServerRequest());
 
 ## Options
 
-#### `proxy(array $ips = [], array $headers = [])`
+#### `proxy(array $ips = [], array $headers = ['Forwarded', 'Forwarded-For', 'Client-Ip', 'X-Forwarded', 'X-Forwarded-For', 'X-Cluster-Client-Ip'])`
 
 Configure the detection through proxies. The first argument is an array of ips or cidr of the trusted proxies. If it's empty, no ip filtering is made. The second argument is a list of the headers to inspect. If it's not defined, uses the default value `['Forwarded', 'Forwarded-For', 'Client-Ip', 'X-Forwarded', 'X-Forwarded-For', 'X-Cluster-Client-Ip']`. Disabled by default.
 
