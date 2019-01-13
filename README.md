@@ -42,7 +42,7 @@ $response = $dispatcher->dispatch(new ServerRequest());
 
 #### `proxy(array $ips = [], array $headers = [])`
 
-Configure the detection through proxies. The first argument is an array of ips of the trusted proxies. If it's empty, no ip filtering is made. The second argument is a list of the headers to inspect. If it's not defined, uses the default value `['Forwarded', 'Forwarded-For', 'Client-Ip', 'X-Forwarded', 'X-Forwarded-For', 'X-Cluster-Client-Ip']`. Disabled by default.
+Configure the detection through proxies. The first argument is an array of ips or cidr of the trusted proxies. If it's empty, no ip filtering is made. The second argument is a list of the headers to inspect. If it's not defined, uses the default value `['Forwarded', 'Forwarded-For', 'Client-Ip', 'X-Forwarded', 'X-Forwarded-For', 'X-Cluster-Client-Ip']`. Disabled by default.
 
 ```php
 //Use proxies
@@ -53,6 +53,11 @@ $middleware = (new Middlewares\ClientIp())->proxy(['10.10.10.10', '10.10.10.11']
 
 //Trust only some proxies by ip using a specific header
 $middleware = (new Middlewares\ClientIp())->proxy(['10.10.10.10', '10.10.10.11'], ['X-Forwarded-For']);
+
+// Trust only some proxies by cidr range
+// usefull when you have an autoscaled proxy(like haproxy) in a subnet
+$middleware = (new Middlewares\ClientIp())->proxy(['192.168.0.0/16', '10.0.0.0/8']);
+
 ```
 
 #### `remote($remote = true)`
