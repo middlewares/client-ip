@@ -79,6 +79,21 @@ class ClientIpTest extends TestCase
         $this->assertEquals('123.123.123.123', (string) $response->getBody());
     }
 
+    public function testClientIpV6NotProxy()
+    {
+        $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '[::1]'])
+            ->withHeader('X-Forwarded', '2001:0db8:85a3:0000:0000:8a2e:0370:7334');
+
+        $response = Dispatcher::run([
+            new ClientIp(),
+            function ($request) {
+                echo $request->getAttribute('client-ip');
+            },
+        ], $request);
+
+        $this->assertEquals('::1', (string) $response->getBody());
+    }
+
     public function testCustomAttribute()
     {
         $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '123.123.123.123']);
