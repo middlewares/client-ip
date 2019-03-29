@@ -189,9 +189,10 @@ class ClientIp implements MiddlewareInterface
     private function getLocalIp(ServerRequestInterface $request)
     {
         $server = $request->getServerParams();
+        $ip = trim($server['REMOTE_ADDR'] ?? '', '[]');
 
-        if (!empty($server['REMOTE_ADDR']) && self::isValid($server['REMOTE_ADDR'])) {
-            return $server['REMOTE_ADDR'];
+        if (self::isValid($ip)) {
+            return $ip;
         }
     }
 
