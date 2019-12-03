@@ -67,14 +67,12 @@ class ClientIp implements MiddlewareInterface
 
     /**
      * Detect and return the ip.
-     *
-     * @return string|null
      */
-    private function getIp(ServerRequestInterface $request)
+    private function getIp(ServerRequestInterface $request): ?string
     {
         $localIp = $this->getLocalIp($request);
 
-        if ($this->proxyIps && !$this->isInProxiedIps($localIp)) {
+        if (!empty($this->proxyIps) && !$this->isInProxiedIps($localIp)) {
             // Local IP address does not point at a known proxy, do not attempt
             // to read proxied IP address.
             return $localIp;
@@ -92,9 +90,6 @@ class ClientIp implements MiddlewareInterface
 
     /**
      * checks if the given ip address is in the list of proxied ips provided
-     *
-     * @param  string $ip
-     * @return bool
      */
     private function isInProxiedIps(string $ip): bool
     {
