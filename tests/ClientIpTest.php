@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace Middlewares\Tests;
 
-use Eloquent\Phony\Phpunit\Phony;
 use Middlewares\ClientIp;
 use Middlewares\Utils\Dispatcher;
 use Middlewares\Utils\Factory;
@@ -11,12 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class ClientIpTest extends TestCase
 {
-    public function tearDown()
-    {
-        // http://eloquent-software.com/phony/latest/#restoring-global-functions-after-stubbing
-        Phony::restoreGlobalFunctions();
-    }
-
     public function ipsProvider(): array
     {
         return [
@@ -192,24 +185,5 @@ class ClientIpTest extends TestCase
         ], $request);
 
         $this->assertEquals('', (string) $response->getBody());
-    }
-
-    public function testRemote()
-    {
-        // http://eloquent-software.com/phony/latest/#stubbing-global-functions
-        $fileGetContents = Phony::stubGlobal('file_get_contents', 'Middlewares');
-        $fileGetContents->returns($expected = '192.168.0.100');
-
-        $response = Dispatcher::run([
-            (new ClientIp())->remote(),
-            function ($request) {
-                echo $request->getAttribute('client-ip');
-            },
-        ]);
-
-        $this->assertEquals($expected, (string) $response->getBody());
-
-        // the service should have been called
-        $fileGetContents->calledWith('http://ipecho.net/plain');
     }
 }

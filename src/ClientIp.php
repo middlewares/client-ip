@@ -11,11 +11,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 class ClientIp implements MiddlewareInterface
 {
     /**
-     * @var bool
-     */
-    private $remote = false;
-
-    /**
      * @var string The attribute name
      */
     private $attribute = 'client-ip';
@@ -51,17 +46,6 @@ class ClientIp implements MiddlewareInterface
     }
 
     /**
-     * To get the ip from a remote service.
-     * Useful for testing purposes on localhost.
-     */
-    public function remote(bool $remote = true): self
-    {
-        $this->remote = $remote;
-
-        return $this;
-    }
-
-    /**
      * Set the attribute name to store client's IP address.
      */
     public function attribute(string $attribute): self
@@ -88,13 +72,6 @@ class ClientIp implements MiddlewareInterface
      */
     private function getIp(ServerRequestInterface $request)
     {
-        $remoteIp = $this->getRemoteIp();
-
-        if (!empty($remoteIp)) {
-            // Found IP address via remote service.
-            return $remoteIp;
-        }
-
         $localIp = $this->getLocalIp($request);
 
         if ($this->proxyIps && !$this->isInProxiedIps($localIp)) {
@@ -144,27 +121,9 @@ class ClientIp implements MiddlewareInterface
     }
 
     /**
-     * Returns the IP address from remote service.
-     *
-     * @return string|null
-     */
-    private function getRemoteIp()
-    {
-        if ($this->remote) {
-            $ip = file_get_contents('http://ipecho.net/plain');
-
-            if ($ip && self::isValid($ip)) {
-                return $ip;
-            }
-        }
-    }
-
-    /**
      * Returns the first valid proxied IP found.
-     *
-     * @return string|null
      */
-    private function getProxiedIp(ServerRequestInterface $request)
+    private function getProxiedIp(ServerRequestInterface $request): ?string
     {
         foreach ($this->proxyHeaders as $name) {
             if ($request->hasHeader($name)) {
@@ -179,29 +138,25 @@ class ClientIp implements MiddlewareInterface
                 }
             }
         }
+
+        return null;
     }
 
     /**
      * Returns the remote address of the request, if valid.
-     *
-     * @return string|null
      */
-    private function getLocalIp(ServerRequestInterface $request)
+    private function getLocalIp(ServerRequestInterface $request): ?string
     {
         $server = $request->getServerParams();
         $ip = trim($server['REMOTE_ADDR'] ?? '', '[]');
 
-        if (self::isValid($ip)) {
-            return $ip;
-        }
+        return self::isValid($ip) ? $ip : null;
     }
 
     /**
      * Returns the first valid ip found in the Forwarded or X-Forwarded header.
-     *
-     * @return string|null
      */
-    private function getForwardedHeaderIp(string $header)
+    private function getForwardedHeaderIp(string $header): ?string
     {
         foreach (array_reverse(array_map('trim', explode(',', strtolower($header)))) as $values) {
             foreach (array_reverse(array_map('trim', explode(';', $values))) as $directive) {
@@ -216,20 +171,22 @@ class ClientIp implements MiddlewareInterface
                 }
             }
         }
+
+        return null;
     }
 
     /**
      * Returns the first valid ip found in the header.
-     *
-     * @return string|null
      */
-    private function getHeaderIp(string $header)
+    private function getHeaderIp(string $header): ?string
     {
         foreach (array_reverse(array_map('trim', explode(',', $header))) as $ip) {
             if (self::isValid($ip) && !$this->isInProxiedIps($ip)) {
                 return $ip;
             }
         }
+
+        return null;
     }
 
     /**
