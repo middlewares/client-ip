@@ -2,8 +2,7 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE)
-[![Build Status][ico-travis]][link-travis]
-[![Quality Score][ico-scrutinizer]][link-scrutinizer]
+![Testing][ico-ga]
 [![Total Downloads][ico-downloads]][link-downloads]
 
 Middleware to detect the client ip and save it as a request attribute.
@@ -73,11 +72,9 @@ The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/middlewares/client-ip.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/middlewares/client-ip/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/g/middlewares/client-ip.svg?style=flat-square
+[ico-ga]: https://github.com/middlewares/client-ip/workflows/testing/badge.svg
 [ico-downloads]: https://img.shields.io/packagist/dt/middlewares/client-ip.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/middlewares/client-ip
-[link-travis]: https://travis-ci.org/middlewares/client-ip
 [link-scrutinizer]: https://scrutinizer-ci.com/g/middlewares/client-ip
 [link-downloads]: https://packagist.org/packages/middlewares/client-ip
