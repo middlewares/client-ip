@@ -16,17 +16,20 @@ class ClientIp implements MiddlewareInterface
     private $attribute = 'client-ip';
 
     /**
-     * @var array The trusted proxy headers
+     * @var string[] The trusted proxy headers
      */
     private $proxyHeaders = [];
 
     /**
-     * @var array The trusted proxy ips
+     * @var string[] The trusted proxy ips
      */
     private $proxyIps = [];
 
     /**
      * Configure the proxy.
+     *
+     * @param array<string> $ips
+     * @param array<string> $headers
      */
     public function proxy(
         array $ips = [],
@@ -98,6 +101,7 @@ class ClientIp implements MiddlewareInterface
                 return true;
             }
         }
+
         return false;
     }
 
