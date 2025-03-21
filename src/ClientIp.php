@@ -75,7 +75,7 @@ class ClientIp implements MiddlewareInterface
     {
         $localIp = $this->getLocalIp($request);
 
-        if (!empty($this->proxyIps) && !$this->isInProxiedIps($localIp)) {
+        if (!empty($this->proxyIps) && !empty($localIp) && !$this->isInProxiedIps($localIp)) {
             // Local IP address does not point at a known proxy, do not attempt
             // to read proxied IP address.
             return $localIp;
