@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class ClientIpTest extends TestCase
 {
+    /**
+     * @return array<array<int,string|array<string,string>>>
+     */
     public function ipsProvider(): array
     {
         return [
@@ -38,8 +41,9 @@ class ClientIpTest extends TestCase
 
     /**
      * @dataProvider ipsProvider
+     * @param array<string,string> $headers
      */
-    public function testClientIpProxy(array $headers, string $ip)
+    public function testClientIpProxy(array $headers, string $ip): void
     {
         $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '123.123.123.123']);
 
@@ -57,7 +61,7 @@ class ClientIpTest extends TestCase
         $this->assertEquals($ip, (string) $response->getBody());
     }
 
-    public function testClientIpNotProxy()
+    public function testClientIpNotProxy(): void
     {
         $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '123.123.123.123'])
             ->withHeader('X-Forwarded', '11.11.11.11');
@@ -72,7 +76,7 @@ class ClientIpTest extends TestCase
         $this->assertEquals('123.123.123.123', (string) $response->getBody());
     }
 
-    public function testClientIpV6NotProxy()
+    public function testClientIpV6NotProxy(): void
     {
         $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '[::1]'])
             ->withHeader('X-Forwarded', '2001:0db8:85a3:0000:0000:8a2e:0370:7334');
@@ -87,7 +91,7 @@ class ClientIpTest extends TestCase
         $this->assertEquals('::1', (string) $response->getBody());
     }
 
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '123.123.123.123']);
 
@@ -101,6 +105,9 @@ class ClientIpTest extends TestCase
         $this->assertEquals('123.123.123.123', (string) $response->getBody());
     }
 
+    /**
+     * @return array<int,array<int, array<string, string>>>
+     */
     public function proxyProvider(): array
     {
         // 4.4.4.4 is IP spoofed by cleint
@@ -127,8 +134,9 @@ class ClientIpTest extends TestCase
 
     /**
      * @dataProvider proxyProvider
+     * @param array<string,string> $headers
      */
-    public function testProxyIp(array $headers)
+    public function testProxyIp(array $headers): void
     {
         $request = Factory::createServerRequest('GET', '/', ['REMOTE_ADDR' => '1.1.1.1']);
 
@@ -173,7 +181,7 @@ class ClientIpTest extends TestCase
         $this->assertEquals('1.1.1.1', (string) $response->getBody());
     }
 
-    public function testNoRemoteAddr()
+    public function testNoRemoteAddr(): void
     {
         $request = Factory::createServerRequest('GET', '/');
 
